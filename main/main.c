@@ -140,7 +140,7 @@ int main(void)
   MX_UART4_Init();
   /* USER CODE BEGIN 2 */
 
-  HAL_UART_Receive_IT(&huart2, &cdata,1); //1바이?�� ?��?���???????? ?��?��?��?��?
+  HAL_UART_Receive_IT(&huart2, &cdata,1); //1바이트 받음음
 
   printf("%s\r\n",__FILE__);
   printf("main() Start!!\r\n");
@@ -174,11 +174,12 @@ int main(void)
 		  clrscr();
 		  size = strlen(rx2Data);
 		  if (size < 17) {
-			  //(x,y) y�?? ?��, x�?? ?��
-			  lcd(0, 0, rx2Data); //1번째 ?��?�� 1번째 ?��
+			  //(x,y) y가 행
+			  lcd(0, 0, rx2Data); //1번째 행에 표시
 		  }
-		  //?��?��?�� size<41
+		  //사이즈가 size<41 넘어가면
 		  else if (size < 33) {
+			  //두 줄에 나눠서 표시시
 			  lcd(0, 0, rx2Data);
 			  lcd(0, 1, rx2Data + 16);
 		  }
