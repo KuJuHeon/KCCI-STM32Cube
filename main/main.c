@@ -11,7 +11,136 @@
   *
   * This software is licensed under terms that can be found in the LICENSE file
   * in the root directory of this software component.
-  * If no LICENSE 송
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  */
+/* USER CODE END Header */
+/* Includes ------------------------------------------------------------------*/
+#include "main.h"
+
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+#include <stdio.h>
+#include <string.h>
+#include "dcmotor.h"
+#include "key.h"
+#include "lcd.h"
+/* USER CODE END Includes */
+
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
+
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+
+
+/* USER CODE END PD */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+/* Private variables ---------------------------------------------------------*/
+TIM_HandleTypeDef htim7;
+//TIM_HandleTypeDef htim10;
+
+UART_HandleTypeDef huart4;
+UART_HandleTypeDef huart2;
+
+/* USER CODE BEGIN PV */
+// 7세트먼트 배열
+unsigned char Font[19] = {0x3F, 0X06, 0X5B, 0X4F,
+                                         0X66, 0X6D, 0X7C, 0X07,
+                                         0X7F, 0X67, 0X77, 0X7C,
+                                         0X39, 0X5E, 0X79, 0X71,
+                                         0X08, 0X80, 0x40};
+
+volatile unsigned char arrayNum[4] = {0,};
+volatile unsigned char rx2Flag = 0;
+char rx2Data[50];
+volatile int fndFlag = 1;
+volatile unsigned int t_cnt = 0,  m_cnt = 0, m_cntFlag = 0;
+volatile int duty = 30;
+extern TIM_HandleTypeDef htim10;
+uint8_t cdata;
+extern volatile int key;
+
+double km,kcal;
+char km_kcal[17];
+
+#define CMD_SIZE 50
+#ifdef __GNUC__
+/* With GCC, small printf (option LD Linker->Libraries->Small printf
+   set to 'Yes') calls __io_putchar() */
+#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
+#else
+#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
+#endif /* __GNUC__ */
+/* USER CODE END PV */
+
+/* Private function prototypes -----------------------------------------------*/
+void SystemClock_Config(void);
+static void MX_GPIO_Init(void);
+static void MX_TIM7_Init(void);
+static void MX_USART2_UART_Init(void);
+//static void MX_TIM10_Init(void);
+static void MX_UART4_Init(void);
+/* USER CODE BEGIN PFP */
+void FND_Init();
+void display_fnd(int N);
+void display_digit(int pos,int num);
+void bluetooth_Event();
+/* USER CODE END PFP */
+
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
+
+/* USER CODE END 0 */
+
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
+int main(void)
+{
+
+  /* USER CODE BEGIN 1 */
+  int dc_start = 0, stopFlag = 0; // stop
+  int pwm = (int)(17700 * (duty / 100.0));
+  int standard = (int)(17700 * (30 / 100.0));
+  int size;
+
+  /* USER CODE END 1 */
+
+  /* MCU Configuration--------------------------------------------------------*/
+
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  HAL_Init();
+
+  /* USER CODE BEGIN Init */
+
+  /* USER CODE END Init */
+
+  /* Configure the system clock */
+  SystemClock_Config();
+
+  /* USER CODE BEGIN SysInit */
+
+  /* USER CODE END SysInit */
+
+  /* Initialize all configured peripherals */
+  MX_GPIO_Init();
+  //MX_TIM7_Init();
+  MX_USART2_UART_Init();
+  //MX_TIM10_Init();
+  MX_UART4_Init();
+  /* USER CODE BEGIN 2 */
+
+  HAL_UART_Receive_IT(&huart2, &cdata,1); //1바이?�� ?��?���???????? ?��?��?��?��?
 
   printf("%s\r\n",__FILE__);
   printf("main() Start!!\r\n");
@@ -45,13 +174,12 @@
 		  clrscr();
 		  size = strlen(rx2Data);
 		  if (size < 17) {
-			  //(x,y) y가 행
-			  lcd(0, 0, rx2Data); //1번째 행에 표시
+			  //(x,y) y�?? ?��, x�?? ?��
+			  lcd(0, 0, rx2Data); //1번째 ?��?�� 1번째 ?��
 		  }
-		  //문자열 길이가 size<41 넘으면
+		  //?��?��?�� size<41
 		  else if (size < 33) {
-			  //두 줄에 나눠서 표시
-			  lcd(0, 0, rx2Data); 
+			  lcd(0, 0, rx2Data);
 			  lcd(0, 1, rx2Data + 16);
 		  }
 		  rx2Flag = 0;
