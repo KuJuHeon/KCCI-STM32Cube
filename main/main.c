@@ -146,6 +146,7 @@ int main(void)
   printf("main() Start!!\r\n");
 
   FND_Init();
+  //모터에 tim10
   DCMOTOR_Init();
   LCD_Init();
 
