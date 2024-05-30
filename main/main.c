@@ -562,8 +562,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			m_cntFlag = 1;
 
 			//km, kcal 계산
-			km += ((double)(duty/10)) / 3600;
-			kcal += 0.0157*((0.1*(duty/10)*3.5)/3.5)*60;
+			double v = ((double)(duty/10)) / 3600;
+			km += v;
+			kcal += 0.0157*((0.1*v*3.5)/3.5)*60;
 		}
 		display_digit(digit,arrayNum[digit]);
 		digit = (digit + 1)%4;
